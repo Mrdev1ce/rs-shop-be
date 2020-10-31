@@ -1,18 +1,20 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import "source-map-support/register";
 import { ProductService } from "../services/product.service";
-import { GatewayInternalErrorResult } from "../common/lambda-results";
-
-const productService = new ProductService();
+import {
+  buildGatewayResult,
+  buildGatewayInternalErrorResult,
+} from "../common/lambda-results-builder";
 
 export const getProductsList: APIGatewayProxyHandler = async () => {
+  const productService = new ProductService();
+
   try {
-    const productsList = productService.getProductList();
-    return {
-      statusCode: 200,
-      body: JSON.stringify(productsList, null, 2),
-    };
+    const productsList = await productService.getProductList();
+    return buildGatewayResult({
+      body: productsList,
+    });
   } catch (e) {
-    return new GatewayInternalErrorResult();
+    return buildGatewayInternalErrorResult();
   }
 };
