@@ -11,11 +11,11 @@ type Product = {
 export class ProductService {
   private products: Product[] = productsMock;
 
-  public getProductList(): Product[] {
+  public async getProductList(): Promise<Product[]> {
     return this.products;
   }
 
-  public getProductById(id: string): Product | null {
+  public async getProductById(id: string): Promise<Product | null> {
     const product = this.products.find((p) => p.id === id);
     return product || null;
   }
