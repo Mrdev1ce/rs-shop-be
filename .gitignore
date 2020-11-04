@@ -26,6 +26,9 @@ node_modules/
 .env
 .env.test
 
+# serverless
+.serverless
+
 # build
 dist
 
