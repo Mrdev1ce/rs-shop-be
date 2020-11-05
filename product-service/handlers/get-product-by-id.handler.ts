@@ -1,6 +1,6 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import "source-map-support/register";
-import { ProductService } from "../services/product.service";
+import { ProductService } from "../services/product/product.service";
 import {
   buildGatewayResult,
   buildGatewayInternalErrorResult,
@@ -24,6 +24,7 @@ export const getProductById: APIGatewayProxyHandler = async (event) => {
       body: product,
     });
   } catch (e) {
+    console.error(e);
     return buildGatewayInternalErrorResult();
   }
 };
