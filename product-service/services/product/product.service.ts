@@ -9,4 +9,8 @@ export class ProductService {
   public async getProductById(id: string): Promise<Product | null> {
     return productDAL.getById(id);
   }
+
+  public async createProduct(product: Product): Promise<Product> {
+    return productDAL.create(product);
+  }
 }

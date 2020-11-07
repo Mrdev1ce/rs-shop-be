@@ -28,10 +28,28 @@ export const buildGatewayResult = ({
   };
 };
 
+export const buildCreatedGatewayResult = (body: unknown) => {
+  return buildGatewayResult({
+    statusCode: 201,
+    body,
+  });
+};
+
 export const buildGatewayNotFoundResult = (message?: string) => {
   const response = {
     body: message ? { message } : null,
     statusCode: 404,
+  };
+  return buildGatewayResult(response);
+};
+
+export const buildGatewayBadRequestResult = (
+  message?: string,
+  data?: Record<string, unknown>
+) => {
+  const response = {
+    body: { message, ...data },
+    statusCode: 400,
   };
   return buildGatewayResult(response);
 };

@@ -1,17 +1,22 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import "source-map-support/register";
-import { ProductService } from "../services/product/product.service";
+import { ProductService } from "../../services/product/product.service";
 import {
   buildGatewayResult,
   buildGatewayInternalErrorResult,
   buildGatewayNotFoundResult,
-} from "../common/lambda-results-builder";
+} from "../../common/lambda-results-builder";
+import { Logger } from "../../common/logger";
+
+const logger = new Logger("GetProductByIdHandler");
 
 export const getProductById: APIGatewayProxyHandler = async (event) => {
   const {
     pathParameters: { productId },
   } = event;
   const productService = new ProductService();
+
+  logger.info("Input", event);
 
   try {
     const product = await productService.getProductById(productId);
@@ -24,7 +29,7 @@ export const getProductById: APIGatewayProxyHandler = async (event) => {
       body: product,
     });
   } catch (e) {
-    console.error(e);
+    logger.error("Internal server error", e);
     return buildGatewayInternalErrorResult();
   }
 };

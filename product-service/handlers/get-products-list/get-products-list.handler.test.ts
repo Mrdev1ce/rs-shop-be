@@ -1,6 +1,6 @@
 import { getProductsList } from "./get-products-list.handler";
 import { APIGatewayProxyEvent } from "aws-lambda";
-import { buildBody } from "../common/lambda-results-builder";
+import { buildBody } from "../../common/lambda-results-builder";
 import { ProductService } from "../services/product.service";
 
 jest.mock("../services/product.service");
