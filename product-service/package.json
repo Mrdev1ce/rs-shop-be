@@ -9,7 +9,6 @@
   "dependencies": {
     "joi": "^17.3.0",
     "pg": "^8.4.2",
-    "serverless-event-body-option": "^1.2.0",
     "source-map-support": "^0.5.10"
   },
   "devDependencies": {
