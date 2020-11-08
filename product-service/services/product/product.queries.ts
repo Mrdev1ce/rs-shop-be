@@ -40,7 +40,7 @@ export class ProductQueryBuilder {
       name: "createStock",
       text:
         "insert into stocks (product_id, count) values ($1, $2) returning *",
-      values: [null, count],
+      values: [productId, count],
     };
   }
 }
