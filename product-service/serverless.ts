@@ -11,11 +11,7 @@ const serverlessConfiguration: Serverless = {
       includeModules: true,
     },
   },
-  plugins: [
-    "serverless-webpack",
-    "serverless-dotenv-plugin",
-    // "serverless-event-body-option",
-  ],
+  plugins: ["serverless-webpack", "serverless-dotenv-plugin"],
   provider: {
     name: "aws",
     runtime: "nodejs12.x",
