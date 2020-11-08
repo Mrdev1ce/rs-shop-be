@@ -16,16 +16,48 @@ paths:
       tags:
       - "products"
       summary: "Get products list"
-      operationId: "findPetsByStatus"
+      operationId: "getAllProducts"
       produces:
       - "application/json"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           schema:
             type: "array"
             items:
               $ref: "#/definitions/Product"
+        "500":
+          description: "Internal server error"
+    post:
+      tags:
+        - "products"
+      summary: "Create product"
+      operationId: "createProduct"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Product object that need to be added to the store"
+          required: true
+          schema:
+            $ref: "#/definitions/Product"
+      responses:
+        "201":
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/Product"
+        "400":
+          description: "Incorrect request"
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+              error:
+                type: string
         "500":
           description: "Internal server error"
   /products/{productId}:
@@ -45,11 +77,11 @@ paths:
         type: "integer"
       responses:
         "200":
-          description: "successful operation"
+          description: "Successful operation"
           schema:
             $ref: "#/definitions/Product"
         "404":
-          description: "Pet not found"
+          description: "Product not found"
         "500":
           description: "Internal server error"
 definitions:
