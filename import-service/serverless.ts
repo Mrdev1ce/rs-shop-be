@@ -1,5 +1,6 @@
 import type { Serverless } from "serverless/aws";
 import { DEFAULT_REGION } from "../core/env.config";
+import { IMPORT_SERVICE_BUCKET, UPLOAD_DIRECTORY } from "./common/config";
 
 // resources:
 //   Resources:
@@ -60,6 +61,18 @@ const serverlessConfiguration: Serverless = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
     },
+    iamRoleStatements: [
+      {
+        Effect: "Allow",
+        Action: "s3:ListBucket",
+        Resource: "arn:aws:s3:::import-service-bucket",
+      },
+      {
+        Effect: "Allow",
+        Action: "s3:*",
+        Resource: "arn:aws:s3:::import-service-bucket/*",
+      },
+    ],
   },
   functions: {
     importProductsFile: {
@@ -76,6 +89,24 @@ const serverlessConfiguration: Serverless = {
                 },
               },
             },
+          },
+        },
+      ],
+    },
+    parseProducts: {
+      handler: "handler.parseProducts",
+      events: [
+        {
+          s3: {
+            bucket: IMPORT_SERVICE_BUCKET,
+            event: "s3:ObjectCreated:*",
+            rules: [
+              {
+                prefix: `${UPLOAD_DIRECTORY}/`,
+                suffix: "",
+              },
+            ],
+            existing: true,
           },
         },
       ],
