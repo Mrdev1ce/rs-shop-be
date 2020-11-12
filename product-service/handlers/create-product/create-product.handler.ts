@@ -7,7 +7,7 @@ import {
   buildGatewayInternalErrorResult,
   buildGatewayBadRequestResult,
 } from "../../common/lambda-results-builder";
-import { Logger } from "../../common/logger";
+import { Logger } from "../../../core/logger";
 import { validateProductOnCreate } from "./product.validators";
 
 const logger = new Logger("CreateProductHandler");

@@ -5,7 +5,7 @@ import {
   buildGatewayResult,
   buildGatewayInternalErrorResult,
 } from "../../common/lambda-results-builder";
-import { Logger } from "../../common/logger";
+import { Logger } from "../../../core/logger";
 
 const logger = new Logger("GetProductsListHandler");
 
