@@ -30,25 +30,33 @@ export const parseProducts: S3Handler = (event, _context) => {
           logger.info("Parsed chunk", data);
         })
         .on("end", async () => {
-          logger.info(
-            `Copy from ${IMPORT_SERVICE_BUCKET}/${record.s3.object.key}`
-          );
-
+          const copyFrom = `${IMPORT_SERVICE_BUCKET}/${record.s3.object.key}`;
           const copyTo = record.s3.object.key.replace(
             UPLOAD_DIRECTORY,
             PARSED_DIRECTORY
           );
 
-          logger.info(`Coping to ${copyTo}`);
+          logger.info(`Copy from ${copyFrom}`);
+
           await s3
             .copyObject({
+              CopySource: copyFrom,
               Bucket: IMPORT_SERVICE_BUCKET,
-              CopySource: record.s3.object.key,
               Key: copyTo,
             })
             .promise();
 
           logger.info(`Copied to ${IMPORT_SERVICE_BUCKET}/${copyTo}`);
+
+          await s3
+            .deleteObject({
+              Bucket: IMPORT_SERVICE_BUCKET,
+              Key: record.s3.object.key,
+            })
+            .promise();
+          logger.info(
+            `Removed ${IMPORT_SERVICE_BUCKET}/${record.s3.object.key}`
+          );
         });
     });
   } catch (e) {
