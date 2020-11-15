@@ -10,11 +10,12 @@ import {
 } from "../../common/config";
 import { Logger } from "../../../core/logger";
 
-const s3 = new S3({ region: DEFAULT_REGION });
 const logger = new Logger("ParseProductsHandler");
 
 export const parseProducts: S3Handler = (event, _context) => {
   try {
+    const s3 = new S3({ region: DEFAULT_REGION });
+
     logger.info("Input records", event.Records);
     event.Records.forEach((record) => {
       const s3Stream = s3

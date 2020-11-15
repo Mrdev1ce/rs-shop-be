@@ -7,13 +7,15 @@ import {
 } from "../../common/lambda-results-builder";
 import { DEFAULT_REGION } from "../../../core/env.config";
 import { UPLOAD_DIRECTORY, IMPORT_SERVICE_BUCKET } from "../../common/config";
+import { Logger } from "../../../core/logger";
 
-const s3 = new S3({ region: DEFAULT_REGION });
+const logger = new Logger("ImportProductsFileHandler");
 
 export const importProductsFile: APIGatewayProxyHandler = async (
-  event,
-  _context
+  event
 ) => {
+  const s3 = new S3({ region: DEFAULT_REGION });
+
   try {
     const { name: fileName } = event.queryStringParameters;
     const params = {
@@ -29,7 +31,7 @@ export const importProductsFile: APIGatewayProxyHandler = async (
       body: { url },
     });
   } catch (e) {
-    console.error(e);
+    logger.error("Internal Server Error", e);
     return buildGatewayInternalErrorResult();
   }
 };
