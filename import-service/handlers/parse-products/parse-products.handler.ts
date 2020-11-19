@@ -1,9 +1,10 @@
 import { S3Handler } from "aws-lambda";
 import "source-map-support/register";
-import { S3 } from "aws-sdk";
+import { S3, SQS } from "aws-sdk";
 import * as csv from "csv-parser";
 import { DEFAULT_REGION } from "../../../core/env.config";
 import {
+  CATALOG_ITEMS_QUEUE_URL,
   IMPORT_SERVICE_BUCKET,
   PARSED_DIRECTORY,
   UPLOAD_DIRECTORY,
@@ -15,6 +16,7 @@ const logger = new Logger("ParseProductsHandler");
 export const parseProducts: S3Handler = (event, _context) => {
   try {
     const s3 = new S3({ region: DEFAULT_REGION });
+    const sqs = new SQS();
 
     logger.info("Input records", event.Records);
     event.Records.forEach((record) => {
@@ -27,8 +29,14 @@ export const parseProducts: S3Handler = (event, _context) => {
 
       s3Stream
         .pipe(csv())
-        .on("data", (data) => {
+        .on("data", async (data) => {
           logger.info("Parsed chunk", data);
+          await sqs
+            .sendMessage({
+              QueueUrl: CATALOG_ITEMS_QUEUE_URL,
+              MessageBody: JSON.stringify(data),
+            })
+            .promise();
         })
         .on("end", async () => {
           const copyFrom = `${IMPORT_SERVICE_BUCKET}/${record.s3.object.key}`;

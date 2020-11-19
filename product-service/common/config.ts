@@ -1,4 +1,11 @@
-const { PG_HOST, PG_PORT, PG_DATABASE, PG_USERNAME, PG_PASSWORD } = process.env;
+const {
+  PG_HOST,
+  PG_PORT,
+  PG_DATABASE,
+  PG_USERNAME,
+  PG_PASSWORD,
+  PRODUCTS_QUEUE_URL,
+} = process.env;
 
 export const config = {
   db: {
@@ -8,4 +15,5 @@ export const config = {
     PG_USERNAME,
     PG_PASSWORD,
   },
+  PRODUCTS_QUEUE_URL,
 };

@@ -60,6 +60,9 @@ const serverlessConfiguration: Serverless = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
+      CATALOG_ITEMS_QUEUE_URL: {
+        "Fn::ImportValue": "CatalogItemsQueueUrl",
+      },
     },
     iamRoleStatements: [
       {
@@ -71,6 +74,13 @@ const serverlessConfiguration: Serverless = {
         Effect: "Allow",
         Action: "s3:*",
         Resource: "arn:aws:s3:::import-service-bucket/*",
+      },
+      {
+        Effect: "Allow",
+        Action: "sqs:*",
+        Resource: {
+          "Fn::ImportValue": "CatalogItemsQueueArn",
+        },
       },
     ],
   },
