@@ -25,8 +25,56 @@ const serverlessConfiguration: Serverless = {
       PG_DATABASE: "${env:PG_DATABASE}",
       PG_USERNAME: "${env:PG_USERNAME}",
       PG_PASSWORD: "${env:PG_PASSWORD}",
+      PRODUCTS_QUEUE_URL: {
+        Ref: "CatalogItemsQueue",
+      },
     },
     region: "eu-west-1",
+    iamRoleStatements: [
+      {
+        Effect: "Allow",
+        Action: "sqs:*",
+        Resource: {
+          "Fn::GetAtt": ["CatalogItemsQueue", "Arn"],
+        },
+      },
+    ],
+  },
+  resources: {
+    Resources: {
+      CatalogItemsQueue: {
+        Type: "AWS::SQS::Queue",
+        Properties: {
+          QueueName: "products-sqs-queue",
+        },
+      },
+    },
+    Outputs: {
+      CatalogItemsQueue: {
+        Value: {
+          Ref: "CatalogItemsQueue",
+        },
+        Export: {
+          Name: "CatalogItemsQueue",
+        },
+      },
+      CatalogItemsQueueUrl: {
+        Value: {
+          Ref: "CatalogItemsQueue",
+        },
+        Export: {
+          Name: "CatalogItemsQueueUrl",
+        },
+      },
+      CatalogItemsQueueArn: {
+        Value: {
+          "Fn::GetAtt": ["CatalogItemsQueue", "Arn"],
+        },
+        Export: {
+          Name: "CatalogItemsQueueArn",
+        },
+      },
+    },
   },
   functions: {
     getProductsList: {
@@ -61,6 +109,19 @@ const serverlessConfiguration: Serverless = {
             method: "post",
             path: "products",
             cors: true,
+          },
+        },
+      ],
+    },
+    catalogBatchProcess: {
+      handler: "handler.catalogBatchProcess",
+      events: [
+        {
+          sqs: {
+            arn: {
+              "Fn::GetAtt": ["CatalogItemsQueue", "Arn"],
+            },
+            batchSize: 5,
           },
         },
       ],
