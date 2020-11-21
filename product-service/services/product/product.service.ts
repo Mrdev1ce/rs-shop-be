@@ -1,5 +1,5 @@
 import { productDAL } from "./product.dal";
-import { Product } from "./types";
+import { Product } from "../../../core/types";
 
 export class ProductService {
   public async getProductList(): Promise<Product[]> {
@@ -12,5 +12,9 @@ export class ProductService {
 
   public async createProduct(product: Product): Promise<Product> {
     return productDAL.create(product);
+  }
+
+  public async createProducts(products: Product[]): Promise<Product[]> {
+    return productDAL.createBatch(products);
   }
 }

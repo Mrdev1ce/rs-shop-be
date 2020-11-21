@@ -1,7 +1,6 @@
 import { APIGatewayProxyHandler } from "aws-lambda";
 import "source-map-support/register";
 import { ProductService } from "../../services/product/product.service";
-import { Product } from "../../services/product/types";
 import {
   buildCreatedGatewayResult,
   buildGatewayInternalErrorResult,
@@ -9,6 +8,7 @@ import {
 } from "../../common/lambda-results-builder";
 import { Logger } from "../../../core/logger";
 import { validateProductOnCreate } from "./product.validators";
+import { Product } from "../../../core/types";
 
 const logger = new Logger("CreateProductHandler");
 

@@ -2,7 +2,7 @@ import { Client } from "pg";
 import { config } from "../../common/config";
 
 import { ProductQueryBuilder } from "./product.queries";
-import { Product, StockDB } from "./types";
+import { Product, StockDB } from "../../../core/types";
 
 const { db } = config;
 
@@ -52,12 +52,12 @@ class ProductDAL {
 
     try {
       await client.query("BEGIN");
-      const createProduct = await this.createProduct(client, product);
-      const createdStock = await this.createStock(
-        client,
-        createProduct.id,
-        product.count
-      );
+      const [createProduct] = await this.createProducts(client, [product]);
+      const stock: StockDB = {
+        productId: createProduct.id,
+        count: product.count,
+      };
+      const [createdStock] = await this.createStocks(client, [stock]);
       await client.query("COMMIT");
 
       return {
@@ -72,40 +72,62 @@ class ProductDAL {
     }
   }
 
-  private async createProduct(
-    client: Client,
-    product: Product
-  ): Promise<Product> {
-    const createProductQuery = this.queryBuilder.buildCreateProductQuery(
-      product
-    );
-    const { rowCount, rows } = await client.query<Product>(createProductQuery);
-    const createdProduct = rows[0];
+  async createBatch(products: Product[]): Promise<Product[]> {
+    const client = ProductDAL.buildPgClient();
+    await client.connect();
 
-    if (rowCount !== 1 || createdProduct == null || createdProduct.id == null) {
-      throw new Error("Unable to create product");
+    try {
+      await client.query("BEGIN");
+      const createdProducts = await this.createProducts(client, products);
+      const stocks: StockDB[] = createdProducts.map((product) => ({
+        productId: product.id,
+        count: product.count,
+      }));
+      await this.createStocks(client, stocks);
+      await client.query("COMMIT");
+
+      return createdProducts;
+    } catch (e) {
+      await client.query("ROLLBACK");
+      throw e;
+    } finally {
+      await client.end();
     }
-
-    return createdProduct;
   }
 
-  private async createStock(
+  private async createProducts(
     client: Client,
-    productId: string,
-    count: number
-  ): Promise<StockDB> {
-    const createStockQuery = this.queryBuilder.buildCreateStockQuery(
-      productId,
-      count
+    products: Product[]
+  ): Promise<Product[]> {
+    const createProductQuery = this.queryBuilder.buildCreateProductsQuery(
+      products
     );
-    const { rowCount, rows } = await client.query<StockDB>(createStockQuery);
-    const createdStock = rows[0];
+    const { rowCount, rows } = await client.query<{ id: string }>(
+      createProductQuery
+    );
 
-    if (rowCount !== 1 || createdStock == null) {
-      throw new Error("Unable to create stock");
+    if (rowCount !== products.length) {
+      throw new Error("Unable to create products");
     }
 
-    return createdStock;
+    return products.map((product, i) => ({
+      ...product,
+      id: rows[i].id,
+    }));
+  }
+
+  private async createStocks(
+    client: Client,
+    stocks: StockDB[]
+  ): Promise<StockDB[]> {
+    const createStockQuery = this.queryBuilder.buildCreateStocksQuery(stocks);
+    const { rowCount } = await client.query(createStockQuery);
+
+    if (rowCount !== stocks.length) {
+      throw new Error("Unable to create stocks");
+    }
+
+    return stocks;
   }
 }
 
