@@ -1,5 +1,6 @@
 import { QueryConfig } from "pg";
-import { Product } from "./types";
+import format from "pg-format";
+import { Product, StockDB } from "../../../core/types";
 
 export class ProductQueryBuilder {
   public buildGetAllQuery(): QueryConfig {
@@ -19,28 +20,26 @@ export class ProductQueryBuilder {
     };
   }
 
-  public buildCreateProductQuery({
-    title,
-    description,
-    price,
-  }: Product): QueryConfig<[string, string, number]> {
+  public buildCreateProductsQuery(products: Product[]): QueryConfig {
+    const values = products.map((product) => {
+      return [product.title, product.description, product.price];
+    });
     return {
-      name: "createProduct",
-      text:
-        "insert into products (title, description, price) values ($1, $2, $3) returning *",
-      values: [title, description, price],
+      name: "createProducts",
+      text: format(
+        "insert into products (title, description, price) values %L returning id",
+        values
+      ),
     };
   }
 
-  public buildCreateStockQuery(
-    productId: string,
-    count: number
-  ): QueryConfig<[string, number]> {
+  public buildCreateStocksQuery(stocks: StockDB[]): QueryConfig {
+    const values = stocks.map((stock) => {
+      return [stock.productId, stock.count];
+    });
     return {
       name: "createStock",
-      text:
-        "insert into stocks (product_id, count) values ($1, $2) returning *",
-      values: [productId, count],
+      text: format("insert into stocks (product_id, count) values %L", values),
     };
   }
 }
