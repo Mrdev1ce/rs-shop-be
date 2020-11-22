@@ -3,7 +3,7 @@ import { APIGatewayProxyEvent } from "aws-lambda";
 import { buildBody } from "../../common/lambda-results-builder";
 import { ProductService } from "../../services/product/product.service";
 
-jest.mock("../services/product.service");
+jest.mock("../../services/product/product.service");
 
 const MockProductService = ProductService as jest.MockedClass<
   typeof ProductService
