@@ -28,6 +28,9 @@ const serverlessConfiguration: Serverless = {
       PRODUCTS_QUEUE_URL: {
         Ref: "CatalogItemsQueue",
       },
+      CREATE_PRODUCT_TOPIC_ARN: {
+        Ref: "CreateProductTopic"
+      }
     },
     region: "eu-west-1",
     iamRoleStatements: [
@@ -36,6 +39,13 @@ const serverlessConfiguration: Serverless = {
         Action: "sqs:*",
         Resource: {
           "Fn::GetAtt": ["CatalogItemsQueue", "Arn"],
+        },
+      },
+      {
+        Effect: "Allow",
+        Action: "sns:*",
+        Resource: {
+          "Ref": "CreateProductTopic"
         },
       },
     ],
@@ -48,6 +58,35 @@ const serverlessConfiguration: Serverless = {
           QueueName: "products-sqs-queue",
         },
       },
+      CreateProductTopic: {
+        Type: "AWS::SNS::Topic",
+        Properties: {
+          TopicName: "create-product-topic"
+        }
+      },
+      CreateProductSubscription: {
+        Type: "AWS::SNS::Subscription",
+        Properties: {
+          Endpoint: "dessqa.dev@gmail.com",
+          Protocol: "email",
+          TopicArn: {
+            Ref: "CreateProductTopic"
+          }
+        }
+      },
+      CreateProductsAlertSubscription: {
+        Type: "AWS::SNS::Subscription",
+        Properties: {
+          Endpoint: "max.jsspec@gmail.com",
+          Protocol: "email",
+          TopicArn: {
+            Ref: "CreateProductTopic"
+          },
+          FilterPolicy: {
+            outOfStock: ["true"]
+          }
+        }
+      }
     },
     Outputs: {
       CatalogItemsQueue: {

@@ -5,6 +5,7 @@ const {
   PG_USERNAME,
   PG_PASSWORD,
   PRODUCTS_QUEUE_URL,
+  CREATE_PRODUCT_TOPIC_ARN,
 } = process.env;
 
 export const config = {
@@ -16,4 +17,5 @@ export const config = {
     PG_PASSWORD,
   },
   PRODUCTS_QUEUE_URL,
+  CREATE_PRODUCT_TOPIC_ARN
 };
