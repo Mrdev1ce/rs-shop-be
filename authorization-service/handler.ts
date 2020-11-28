@@ -1,6 +1,8 @@
 import { APIGatewayTokenAuthorizerHandler } from "aws-lambda";
 import "source-map-support/register";
 
+import { Logger } from "../core/logger";
+
 const effect = {
   ALLOW: "Allow",
   DENY: "Deny",
@@ -24,7 +26,8 @@ const generatePolicy = (principal: string, effect: Effect, arn: string) => ({
 export const basicAuthorizer: APIGatewayTokenAuthorizerHandler = async (
   event
 ) => {
-  console.log(event);
+  const logger = new Logger("BasicAuthorizer");
+  logger.info("INPUT: ", event);
 
   if (event.type !== "TOKEN") {
     throw new Error("Unauthorized");
