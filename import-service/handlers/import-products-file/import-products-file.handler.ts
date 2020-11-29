@@ -11,9 +11,7 @@ import { Logger } from "../../../core/logger";
 
 const logger = new Logger("ImportProductsFileHandler");
 
-export const importProductsFile: APIGatewayProxyHandler = async (
-  event
-) => {
+export const importProductsFile: APIGatewayProxyHandler = async (event) => {
   const s3 = new S3({ region: DEFAULT_REGION });
 
   try {

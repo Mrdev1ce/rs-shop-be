@@ -84,6 +84,23 @@ const serverlessConfiguration: Serverless = {
       },
     ],
   },
+  resources: {
+    Resources: {
+      GatewayResponseDefault400: {
+        Type: "AWS::ApiGateway::GatewayResponse",
+        Properties: {
+          ResponseParameters: {
+            "gatewayresponse.header.Access-Control-Allow-Origin": "'*'",
+            "gatewayresponse.header.Access-Control-Allow-Headers": "'*'",
+          },
+          ResponseType: "DEFAULT_4XX",
+          RestApiId: {
+            Ref: "ApiGatewayRestApi",
+          },
+        },
+      },
+    },
+  },
   functions: {
     importProductsFile: {
       handler: "handler.importProductsFile",
@@ -99,6 +116,7 @@ const serverlessConfiguration: Serverless = {
                 },
               },
             },
+            cors: true,
             authorizer: {
               name: "tokenAuthorizer",
               arn:
@@ -130,46 +148,6 @@ const serverlessConfiguration: Serverless = {
       ],
     },
   },
-  // resources: {
-  //   Resources: {
-  //     ImportS3Bucket: {
-  //       Type: "AWS::S3::Bucket",
-  //       Properties: {
-  //         BucketName: "ImportServiceBucket",
-  //         AccessControl: "PublicRead",
-  //       },
-  //     },
-  //     WebAppS3BucketPolicy: {
-  //       Type: "AWS::S3::BucketPolicy",
-  //       Properties: {
-  //         Bucket: {
-  //           Ref: "WebAppS3Bucket",
-  //         },
-  //         PolicyDocument: {
-  //           Statement: [
-  //             {
-  //               Sid: "AllowCloudFrontAccessIdentity",
-  //               Effect: "Allow",
-  //               Action: "s3:GetObject",
-  //               Resource: "arn:aws:s3:::/*",
-  //               Principal: {
-  //                 AWS: {
-  //                   "Fn::Join": [
-  //                     " ",
-  //                     [
-  //                       "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity",
-  //                       123,
-  //                     ],
-  //                   ],
-  //                 },
-  //               },
-  //             },
-  //           ],
-  //         },
-  //       },
-  //     },
-  //   },
-  // },
 };
 
 module.exports = serverlessConfiguration;

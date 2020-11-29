@@ -2,6 +2,7 @@ import { APIGatewayTokenAuthorizerHandler } from "aws-lambda";
 import "source-map-support/register";
 
 import { Logger } from "../core/logger";
+import { creds } from "./config/creds";
 
 const effect = {
   ALLOW: "Allow",
@@ -35,11 +36,13 @@ export const basicAuthorizer: APIGatewayTokenAuthorizerHandler = async (
   try {
     const token = event.authorizationToken;
     const encodedCreds = token.split(" ")[1];
-    const [user, pass] = Buffer.from(encodedCreds, "base64")
-      .toString("utf-8")
-      .split(":");
+    const decodedCreds = Buffer.from(encodedCreds, "base64").toString("utf-8");
+    logger.info("DECODED CREDS: ", decodedCreds);
+
+    const [user, pass] = decodedCreds.split(":");
+
     const resultEffect =
-      user === "123" && pass === "213" ? effect.ALLOW : effect.DENY;
+      user === creds.USER && pass === creds.PASS ? effect.ALLOW : effect.DENY;
 
     return generatePolicy(encodedCreds, resultEffect, event.methodArn);
   } catch {
