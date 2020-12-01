@@ -50,7 +50,7 @@ const serverlessConfiguration: Serverless = {
     },
   },
   // Add the serverless-webpack plugin
-  plugins: ["serverless-webpack"],
+  plugins: ["serverless-webpack", "serverless-pseudo-parameters"],
   provider: {
     name: "aws",
     runtime: "nodejs12.x",
@@ -120,7 +120,7 @@ const serverlessConfiguration: Serverless = {
             authorizer: {
               name: "tokenAuthorizer",
               arn:
-                "arn:aws:lambda:eu-west-1:428742678759:function:authorization-service-dev-basicAuthorizer",
+                "arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:authorization-service-dev-basicAuthorizer",
               resultTtlInSeconds: 0,
               identitySource: "method.request.header.Authorization",
               type: "token",
