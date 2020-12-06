@@ -1,3 +1,8 @@
+# Directory with local dependencies. Should be installed inside docker container
 node_modules
+
+# Directory with local build files
 dist
+
+# Not necessary inside docker container
 Dockerfile
