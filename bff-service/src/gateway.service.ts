@@ -37,6 +37,9 @@ export class GatewayService {
     method: string,
     body: unknown,
   ): Promise<AxiosResponse> {
+    if (method !== 'GET' || !requestedUrl.includes('products')) {
+      return GatewayService.makeRequest(requestedUrl, method, body);
+    }
     const cacheInputs = { url: requestedUrl, method, body };
     const cached = this._cacheService.get(cacheInputs);
     if (cached != null) {
@@ -61,6 +64,6 @@ export class GatewayService {
     });
   }
   private static getBody(body: unknown): object {
-    return Object.keys(body || {}) ? { body } : {};
+    return Object.keys(body || {}).length > 0 ? { data: body } : {};
   }
 }

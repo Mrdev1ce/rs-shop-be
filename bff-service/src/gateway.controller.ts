@@ -19,11 +19,13 @@ export class GatewayController {
 
     try {
       const result = await serviceRes;
-      return res.status(result.status).json(result.data);
+      console.log('RESULT SERVICE STATUS: ', result.status);
+      return res.header(result.headers).status(result.status).json(result.data);
     } catch (error) {
+      console.error('ERROR: ', error);
       if (error.response) {
-        const { status, data } = error.response;
-        return res.status(status).json(data);
+        const { status, data, headers } = error.response;
+        return res.header(headers).status(status).json(data);
       }
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
