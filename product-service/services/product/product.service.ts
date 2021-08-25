@@ -1,4 +1,4 @@
-import { productDAL } from "./product.dal";
+import { productDAL } from "./product.dynamo.dal";
 import { Product } from "../../../core/types";
 
 export class ProductService {

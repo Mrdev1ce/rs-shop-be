@@ -6,7 +6,7 @@ import { Product, StockDB } from "../../../core/types";
 
 const { db } = config;
 
-class ProductDAL {
+class ProductPgDal {
   private queryBuilder: ProductQueryBuilder;
   constructor() {
     this.queryBuilder = new ProductQueryBuilder();
@@ -23,7 +23,7 @@ class ProductDAL {
   }
 
   async getAll(): Promise<Product[]> {
-    const client = ProductDAL.buildPgClient();
+    const client = ProductPgDal.buildPgClient();
     await client.connect();
 
     const query = this.queryBuilder.buildGetAllQuery();
@@ -35,7 +35,7 @@ class ProductDAL {
   }
 
   async getById(id: string): Promise<Product | null> {
-    const client = ProductDAL.buildPgClient();
+    const client = ProductPgDal.buildPgClient();
     await client.connect();
 
     const query = this.queryBuilder.buildGetByIdQuery(id);
@@ -47,7 +47,7 @@ class ProductDAL {
   }
 
   async create(product: Product): Promise<Product> {
-    const client = ProductDAL.buildPgClient();
+    const client = ProductPgDal.buildPgClient();
     await client.connect();
 
     try {
@@ -73,7 +73,7 @@ class ProductDAL {
   }
 
   async createBatch(products: Product[]): Promise<Product[]> {
-    const client = ProductDAL.buildPgClient();
+    const client = ProductPgDal.buildPgClient();
     await client.connect();
 
     try {
@@ -131,4 +131,4 @@ class ProductDAL {
   }
 }
 
-export const productDAL = new ProductDAL();
+export const productDAL = new ProductPgDal();
