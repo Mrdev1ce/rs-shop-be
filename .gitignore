@@ -29,6 +29,9 @@ node_modules/
 # Serverless directories
 .serverless
 
+# AWS CDK
+cdk.out
+
 # build
 dist
 

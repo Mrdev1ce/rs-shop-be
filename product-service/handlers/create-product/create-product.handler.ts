@@ -6,7 +6,7 @@ import {
   buildGatewayInternalErrorResult,
   buildGatewayBadRequestResult,
 } from "../../common/lambda-results-builder";
-import { Logger } from "../../../core/logger";
+import { Logger } from "../../common/logger";
 import { validateProductOnCreate } from "./product.validators";
 import { Product } from "../../../core/types";
 

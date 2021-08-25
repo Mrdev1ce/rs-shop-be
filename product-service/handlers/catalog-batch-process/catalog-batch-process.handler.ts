@@ -1,6 +1,6 @@
 import { SQSHandler } from "aws-lambda";
 import "source-map-support/register";
-import { Logger } from "../../../core/logger";
+import { Logger } from "../../common/logger";
 import { ProductService } from "../../services/product/product.service";
 import { ProductSnsNotificationService } from "../../services/product-sns-notification/product-sns-notification.service";
 import { Product } from "../../../core/types";

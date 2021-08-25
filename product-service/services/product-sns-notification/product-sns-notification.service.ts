@@ -1,5 +1,5 @@
 import { SNS } from "aws-sdk";
-import { DEFAULT_REGION } from "../../../core/env.config";
+import { DEFAULT_REGION } from "../../common/constants";
 import { Product } from "../../../core/types";
 import { config } from "../../common/config";
 
