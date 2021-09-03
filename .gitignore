@@ -32,6 +32,9 @@ node_modules/
 # AWS CDK
 cdk.out
 
+#AWS SAM
+.aws-sam/
+
 # build
 dist
 

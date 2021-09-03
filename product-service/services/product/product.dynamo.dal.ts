@@ -1,11 +1,14 @@
-import AWS from 'aws-sdk';
+import RawAWS from 'aws-sdk';
+import AWSXRay from 'aws-xray-sdk';
 import { v4 as uuidv4 } from 'uuid';
 import { Product } from "../../../core/types";
 import {Logger} from "../../common/logger";
 
+const AWS = AWSXRay.captureAWS(RawAWS);
+
 class ProductDynamoDal {
   private logger = new Logger("ProductDynamoDal");
-  private productTableName = 'products-service';
+  private productTableName = process.env.PRODUCT_TABLE_NAME;
   private dynamo = new AWS.DynamoDB.DocumentClient();
 
   async getAll(): Promise<Product[]> {

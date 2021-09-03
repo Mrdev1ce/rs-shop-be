@@ -3,7 +3,7 @@ import {RemovalPolicy} from '@aws-cdk/core';
 import {AttributeType, Table} from "@aws-cdk/aws-dynamodb";
 import {NodejsFunction, NodejsFunctionProps} from "@aws-cdk/aws-lambda-nodejs";
 import path from 'path';
-import {Runtime} from "@aws-cdk/aws-lambda";
+import {Runtime, Tracing} from "@aws-cdk/aws-lambda";
 import {LambdaIntegration, RestApi} from "@aws-cdk/aws-apigateway";
 import {Queue} from "@aws-cdk/aws-sqs";
 import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
@@ -16,7 +16,7 @@ export class ProductServiceStack extends cdk.Stack {
 
     const dynamoTable = this.createDynamoTable();
 
-    const {createProductLambda, getProductsListLambda, getProductByIdLambda, catalogBatchProcessLambda} = this.createLambdas();
+    const {createProductLambda, getProductsListLambda, getProductByIdLambda, catalogBatchProcessLambda} = this.createLambdas(dynamoTable.tableName);
 
     this.grantDynamoReadWritePermissionsToLambdas(dynamoTable, [
       createProductLambda,
@@ -49,29 +49,37 @@ export class ProductServiceStack extends cdk.Stack {
     });
   }
 
-  private createLambdas() {
+  private createLambdas(tableName: string) {
     const lambdasPath = path.join(__dirname, 'handlers');
     const nodeJsFunctionProps: NodejsFunctionProps = {
       bundling: {
-        externalModules: ['aws-sdk']
+        nodeModules: ['joi', 'uuid', 'source-map-support', 'aws-xray-sdk']
       },
       depsLockFilePath: path.join(__dirname, 'package-lock.json'),
-      runtime: Runtime.NODEJS_12_X
+      runtime: Runtime.NODEJS_12_X,
+      environment: {
+        PRODUCT_TABLE_NAME: tableName
+      },
+      tracing: Tracing.ACTIVE
     };
     const createProductLambda = new NodejsFunction(this, 'createProduct', {
       entry: path.join(lambdasPath, 'create-product', 'create-product.handler.ts'),
+      handler: 'createProduct',
       ...nodeJsFunctionProps
     });
     const getProductsListLambda = new NodejsFunction(this, 'getProductList', {
       entry: path.join(lambdasPath, 'get-products-list', 'get-products-list.handler.ts'),
+      handler: 'getProductsList',
       ...nodeJsFunctionProps
     });
     const getProductByIdLambda = new NodejsFunction(this, 'getProductById', {
       entry: path.join(lambdasPath, 'get-product-by-id', 'get-product-by-id.handler.ts'),
+      handler: 'getProductById',
       ...nodeJsFunctionProps
     });
     const catalogBatchProcessLambda = new NodejsFunction(this, 'catalogBatchProcessLambda', {
       entry: path.join(lambdasPath, 'catalog-batch-process', 'catalog-batch-process.handler.ts'),
+      handler: 'catalogBatchProcess',
       ...nodeJsFunctionProps
     });
 
@@ -92,7 +100,13 @@ export class ProductServiceStack extends cdk.Stack {
     const getProductByIdLambdaIntegration = new LambdaIntegration(getProductByIdLambda);
 
     const api = new RestApi(this, 'productsApi', {
-      restApiName: 'products'
+      restApiName: 'products',
+      defaultCorsPreflightOptions: {
+        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
+        allowOrigins: ["*"],
+        allowHeaders: ["*"],
+      },
+      deployOptions: { tracingEnabled: true }
     });
 
     const productsResource = api.root.addResource('products');
